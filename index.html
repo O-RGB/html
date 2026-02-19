@@ -1,43 +1,212 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
-  <title>Bitmovin Player Demo</title>
-  <meta charset="UTF-8"/>
-  <meta http-equiv="X-UA-Compatible" content="text/html; charset=utf-8" />
+    <title>Video Streaming Architecture Demo</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="text/html; charset=utf-8" />
 
-  <!-- Bitmovin Player -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bitmovin-player@8/bitmovinplayer.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bitmovin-player@8/bitmovinplayer.js"></script>
 
-  <style>
-    .player-wrapper {
-      width: 90%;
-      margin: 20px auto;
-      box-shadow: 0 0 30px rgba(0,0,0,0.7);
-    }
-  </style>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent-cf: #f38020; /* สีส้ม Cloudflare */
+            --accent-bit: #1da1f2; /* สีฟ้า Bitmovin */
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            
+            gap: 30px;
+        }
+
+        /* กล่องเนื้อหาด้านซ้าย */
+        .info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 { margin-top: 0; font-size: 24px; color: var(--text-main); }
+        h3 { margin: 0 0 10px 0; font-size: 18px; display: flex; align-items: center; gap: 8px;}
+        p { margin: 0 0 15px 0; color: var(--text-muted); line-height: 1.6; font-size: 14px; }
+        
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .tag-cf { background-color: #fef3c7; color: #d97706; }
+        .tag-bit { background-color: #e0f2fe; color: #0284c7; }
+
+        /* ส่วนแสดงผล User ID */
+        .user-profile {
+            background-color: #f1f5f9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 10px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .user-id-text {
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: bold;
+            color: #0f172a;
+            word-break: break-all;
+        }
+
+        button {
+            background-color: var(--text-main);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'Prompt', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        button:hover { background-color: #334155; }
+
+        /* กล่องวิดีโอด้านขวา */
+        .player-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-wrapper {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            background-color: #000;
+        }
+
+        /* Responsive */
+        @media (max-width: 850px) {
+            .container { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-<div class="player-wrapper">
-  <div id="player"></div>
+
+<div class="container">
+    
+
+    <div class="player-panel">
+        <div class="player-wrapper">
+            <div id="player"></div>
+        </div>
+        <p style="text-align: center; margin-top: 15px; font-size: 13px; color: var(--text-muted);">
+            ลองกดเล่น และกรอวิดีโอไปมา จากนั้นนำ User ID ฝั่งซ้ายไปค้นหาในหน้า <b>Audience > Latest Sessions</b> ของ Bitmovin ได้เลย
+        </p>
+    </div>
+
+    <div class="info-panel">
+        <div class="card">
+            <h1>⚙️ ระบบนี้ทำงานอย่างไร?</h1>
+            <p>นี่คือตัวอย่างสถาปัตยกรรมการสตรีมมิ่งวิดีโอที่ออกแบบมาเพื่อลดต้นทุนค่า Egress Fee และเก็บสถิติผู้ใช้งานได้อย่างแม่นยำ</p>
+            
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+
+            <span class="tag tag-cf">1. Storage (ที่เก็บไฟล์)</span>
+            <h3>☁️ Cloudflare R2</h3>
+            <p>วิดีโอถูกจัดเก็บในรูปแบบ <b>HLS (.m3u8 & .ts)</b> บน Cloudflare R2 ซึ่งมีข้อดีคือ <b>"ฟรีค่า Egress (ค่าส่งข้อมูลออก)"</b> ทำให้ประหยัดค่าแบนด์วิดท์มหาศาลเมื่อเทียบกับ AWS S3</p>
+
+            <span class="tag tag-bit">2. Player & Analytics</span>
+            <h3>▶️ Bitmovin Player</h3>
+            <p>ใช้เครื่องเล่นจาก Bitmovin ในการดึงไฟล์จาก R2 มาแสดงผล พร้อมส่งสถิติ <b>Analytics (เช่น ยอดวิว, การกดข้าม, เวลาที่ดู)</b> กลับไปยัง Dashboard</p>
+        </div>
+
+        <div class="card">
+            <h3>👤 ผู้ใช้งานจำลอง (Local Storage)</h3>
+            <p>ระบบได้สร้าง ID จำลองและบันทึกไว้ในเบราว์เซอร์ของคุณ ค่านี้จะถูกส่งไปให้ Bitmovin Analytics เพื่อให้คุณสามารถวิเคราะห์พฤติกรรมแบบ "รายบุคคล" ได้</p>
+            
+            <div class="user-profile">
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Current User ID:</div>
+                <div class="user-id-text" id="display-user-id">กำลังโหลด...</div>
+                <button onclick="resetUserId()">🔄 สร้าง User ID ใหม่ (จำลองคนดูคนใหม่)</button>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 <script type="text/javascript">
-  var conf = {
-    key: '709e487f-8328-4909-8b71-1f5f8f428029',
-    analytics: {
-      key: '824e6e4f-4c55-4dc2-8670-c4c34d118c26',
-      title: 'My First Video',
-      videoId: 'wizard-My_First_Video-1771485207137',
-    },
-  };
+    // --- 1. ระบบจัดการ User ID ผ่าน LocalStorage ---
+    function getOrCreateUserId() {
+        // ลองดึงค่าจาก LocalStorage ก่อน
+        let userId = localStorage.getItem('demo_viewer_id');
+        
+        // ถ้าไม่มี (เข้าเว็บครั้งแรก) ให้สร้างใหม่
+        if (!userId) {
+            // สร้าง ID สุ่ม เช่น user_a1b2c3d4
+            userId = 'user_' + Math.random().toString(36).substr(2, 8);
+            localStorage.setItem('demo_viewer_id', userId);
+        }
+        return userId;
+    }
 
-  var source = {
-    title: 'My First Video',
-    hls: 'https://pub-67264fd15b0f405dbd6a327da60437ba.r2.dev/video-test/playlist.m3u8',
-  };
+    // ดึงค่ามาแสดงผลบนหน้าเว็บ
+    const currentUserId = getOrCreateUserId();
+    document.getElementById('display-user-id').innerText = currentUserId;
 
-  var player = new bitmovin.player.Player(document.getElementById('player'), conf);
-  player.load(source);
+    // ฟังก์ชันสำหรับปุ่มรีเซ็ต
+    function resetUserId() {
+        localStorage.removeItem('demo_viewer_id');
+        location.reload(); // รีเฟรชหน้าเว็บเพื่อสร้าง ID และโหลด Player ใหม่
+    }
+
+    // --- 2. การตั้งค่า Bitmovin Player & Analytics ---
+    var conf = {
+        key: '709e487f-8328-4909-8b71-1f5f8f428029',
+        analytics: {
+            key: '824e6e4f-4c55-4dc2-8670-c4c34d118c26',
+            title: 'My First Video',
+            videoId: 'wizard-My_First_Video-1771485207137',
+            // --- ไฮไลต์สำคัญ: ส่ง User ID ไปให้ระบบวิเคราะห์ของ Bitmovin ---
+            userId: currentUserId 
+        },
+    };
+
+    var source = {
+        title: 'My First Video',
+        hls: 'https://pub-67264fd15b0f405dbd6a327da60437ba.r2.dev/video-test/playlist.m3u8',
+    };
+
+    // --- 3. สั่งโหลด Player ---
+    var player = new bitmovin.player.Player(document.getElementById('player'), conf);
+    player.load(source);
 </script>
 
 </body>
