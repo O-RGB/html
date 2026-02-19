@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bitmovin Player Demo</title>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="text/html; charset=utf-8" />
+
+  <!-- Bitmovin Player -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bitmovin-player@8/bitmovinplayer.js"></script>
+
+  <style>
+    .player-wrapper {
+      width: 90%;
+      margin: 20px auto;
+      box-shadow: 0 0 30px rgba(0,0,0,0.7);
+    }
+  </style>
+</head>
+<body>
+<div class="player-wrapper">
+  <div id="player"></div>
+</div>
+
+<script type="text/javascript">
+  var conf = {
+    key: '709e487f-8328-4909-8b71-1f5f8f428029',
+    analytics: {
+      key: '824e6e4f-4c55-4dc2-8670-c4c34d118c26',
+      title: 'My First Video',
+      videoId: 'wizard-My_First_Video-1771485207137',
+    },
+  };
+
+  var source = {
+    title: 'My First Video',
+    hls: 'https://pub-67264fd15b0f405dbd6a327da60437ba.r2.dev/video-test/playlist.m3u8',
+  };
+
+  var player = new bitmovin.player.Player(document.getElementById('player'), conf);
+  player.load(source);
+</script>
+
+</body>
+</html>
