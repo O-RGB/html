@@ -16,8 +16,7 @@
             --card-bg: #ffffff;
             --text-main: #1e293b;
             --text-muted: #64748b;
-            --accent-cf: #f38020; /* สีส้ม Cloudflare */
-            --accent-bit: #1da1f2; /* สีฟ้า Bitmovin */
+            --accent-cf: #f38020; /* สีส้ม */
         }
 
         body {
@@ -25,176 +24,202 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 40px 20px;
+            padding: 10px 10px;
             display: flex;
             justify-content: center;
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 800px;
             width: 100%;
-            
+            display: flex;
+            flex-direction: column;
             gap: 30px;
         }
 
-        /* กล่องเนื้อหาด้านซ้าย */
-        .info-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        /* ปิดเงาสีเทาคลุมวิดีโอ */
+        .bmpui-ui-uicontainer {
+            background: transparent !important;
+            background-image: none !important;
+        }
+        .bmpui-ui-hugeplaybacktogglebutton {
+            background: transparent !important;
         }
 
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+        /* สีแถบเวลาต่างๆ */
+        .bmpui-ui-seekbar .bmpui-seekbar .bmpui-seekbar-playbackposition {
+            background-color: var(--accent-cf) !important;
+            z-index: 3 !important; 
         }
 
+        .bmpui-ui-seekbar .bmpui-seekbar-playbackposition-marker {
+            background-color: #ffffff !important;
+            z-index: 10 !important; 
+        }
+
+        .bmpui-ui-volumeslider .bmpui-seekbar .bmpui-seekbar-playbackposition,
+        .bmpui-ui-volumeslider .bmpui-seekbar-playbackposition-marker {
+            background-color: #ffffff !important;
+        }
+
+        .bmpui-ui-seekbar .bmpui-seekbar .bmpui-seekbar-bufferlevel {
+            background-color: rgba(255, 255, 255, 0.25) !important;
+            z-index: 1 !important;
+        }
+
+        /* แถบเงาสีส้ม */
+        .custom-max-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: rgba(243, 128, 32, 0.4) !important;
+            pointer-events: none;
+            z-index: 2 !important;
+            border-radius: 2px;
+            width: 0%;
+        }
+
+        /* ---------------------------------------------------
+           🎨 ปรับข้อความ Tooltip ให้สั้น และเพิ่ม Animation การเด้งหลบ
+           --------------------------------------------------- */
+        .custom-max-progress::after {
+            content: attr(data-progress); 
+            position: absolute;
+            right: 0;
+            top: -28px; 
+            transform: translateX(50%); 
+            background-color: rgba(0, 0, 0, 0.85);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0; 
+            
+            transition: opacity 0.2s ease, top 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .custom-max-progress::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -5px; 
+            transform: translateX(50%);
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 5px solid rgba(0, 0, 0, 0.85);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease, top 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-top-color 0.2s ease;
+        }
+
+        /* 🚀 เพิ่มคลาส .is-touched สำหรับมือถือ นอกเหนือจาก :hover */
+        .bmpui-seekbar:hover .custom-max-progress::after,
+        .bmpui-seekbar:hover .custom-max-progress::before,
+        .custom-max-progress.is-touched::after,
+        .custom-max-progress.is-touched::before {
+            opacity: 1;
+        }
+
+        /* คลาสพิเศษสำหรับหลบการชน */
+        .custom-max-progress.avoid-collision::after {
+            top: -52px; 
+            background-color: var(--accent-cf); 
+            color: white;
+        }
+        .custom-max-progress.avoid-collision::before {
+            top: -29px; 
+            border-top-color: var(--accent-cf);
+        }
+
+        /* กล่องเนื้อหา */
+        .info-panel { display: flex; flex-direction: column; gap: 20px; }
+        .card { background-color: var(--card-bg); border-radius: 16px; padding: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -4px rgba(0,0,0,0.05); }
         h1 { margin-top: 0; font-size: 24px; color: var(--text-main); }
         h3 { margin: 0 0 10px 0; font-size: 18px; display: flex; align-items: center; gap: 8px;}
         p { margin: 0 0 15px 0; color: var(--text-muted); line-height: 1.6; font-size: 14px; }
         
-        .tag {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        .tag-cf { background-color: #fef3c7; color: #d97706; }
-        .tag-bit { background-color: #e0f2fe; color: #0284c7; }
-
-        /* ส่วนแสดงผล User ID */
-        .user-profile {
-            background-color: #f1f5f9;
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 10px;
-            border: 1px dashed #cbd5e1;
-        }
-
-        .user-id-text {
-            font-family: monospace;
-            font-size: 16px;
-            font-weight: bold;
-            color: #0f172a;
-            word-break: break-all;
-        }
-
-        button {
-            background-color: var(--text-main);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-family: 'Prompt', sans-serif;
-            font-size: 13px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: 0.2s;
-        }
+        .user-profile { background-color: #f1f5f9; border-radius: 12px; padding: 16px; margin-top: 10px; border: 1px dashed #cbd5e1; }
+        .user-id-text { font-family: monospace; font-size: 16px; font-weight: bold; color: #0f172a; word-break: break-all; }
+        
+        button { background-color: var(--text-main); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-family: 'Prompt', sans-serif; font-size: 13px; cursor: pointer; margin-top: 10px; transition: 0.2s; }
         button:hover { background-color: #334155; }
-
-        /* กล่องวิดีโอด้านขวา */
-        .player-panel {
-            display: flex;
-            flex-direction: column;
+        
+        .progress-box { background-color: #fff7ed; color: #c2410c; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; margin-top: 15px; font-size: 18px; border: 1px solid #fed7aa; }
+        
+        /* กล่องวิดีโอ */
+        .player-panel { display: flex; flex-direction: column; position: relative; }
+        .player-wrapper { width: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1); background-color: #000; position: relative; }
+        
+        .seek-alert {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.85); color: white; padding: 8px 16px; border-radius: 20px;
+            font-size: 14px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; z-index: 99999; 
         }
-
-        .player-wrapper {
-            width: 100%;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            background-color: #000;
-        }
-
-        /* Responsive */
-        @media (max-width: 850px) {
-            .container { grid-template-columns: 1fr; }
-        }
+        .seek-alert.show { opacity: 1; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    
-
     <div class="player-panel">
-        <div class="player-wrapper">
+        <div class="seek-alert" id="seek-alert">⚠️ กรุณาดูตามลำดับ ไม่สามารถข้ามได้</div>
+        
+        <div class="player-wrapper" id="player-wrapper">
             <div id="player"></div>
         </div>
-        <p style="text-align: center; margin-top: 15px; font-size: 13px; color: var(--text-muted);">
-            ลองกดเล่น และกรอวิดีโอไปมา จากนั้นนำ User ID ฝั่งซ้ายไปค้นหาในหน้า <b>Audience > Latest Sessions</b> ของ Bitmovin ได้เลย
-        </p>
     </div>
 
     <div class="info-panel">
         <div class="card">
-            <h1>⚙️ ระบบนี้ทำงานอย่างไร?</h1>
-            <p>นี่คือตัวอย่างสถาปัตยกรรมการสตรีมมิ่งวิดีโอที่ออกแบบมาเพื่อลดต้นทุนค่า Egress Fee และเก็บสถิติผู้ใช้งานได้อย่างแม่นยำ</p>
-            
-            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
-
-            <span class="tag tag-cf">1. Storage (ที่เก็บไฟล์)</span>
-            <h3>☁️ Cloudflare R2</h3>
-            <p>วิดีโอถูกจัดเก็บในรูปแบบ <b>HLS (.m3u8 & .ts)</b> บน Cloudflare R2 ซึ่งมีข้อดีคือ <b>"ฟรีค่า Egress (ค่าส่งข้อมูลออก)"</b> ทำให้ประหยัดค่าแบนด์วิดท์มหาศาลเมื่อเทียบกับ AWS S3</p>
-
-            <span class="tag tag-bit">2. Player & Analytics</span>
-            <h3>▶️ Bitmovin Player</h3>
-            <p>ใช้เครื่องเล่นจาก Bitmovin ในการดึงไฟล์จาก R2 มาแสดงผล พร้อมส่งสถิติ <b>Analytics (เช่น ยอดวิว, การกดข้าม, เวลาที่ดู)</b> กลับไปยัง Dashboard</p>
+            <h1>⚙️ ระบบจำกัดการข้ามวิดีโอ</h1>
+            <p>อัปเดต: รองรับมือถือ 100% 📱 เมื่อใช้นิ้วแตะหรือลากบนแถบเวลา Tooltip จะแสดงผลและหลบหลีกนิ้วอัตโนมัติเช่นเดียวกับการใช้เมาส์บนคอมพิวเตอร์</p>
         </div>
 
         <div class="card">
-            <h3>👤 ผู้ใช้งานจำลอง (Local Storage)</h3>
-            <p>ระบบได้สร้าง ID จำลองและบันทึกไว้ในเบราว์เซอร์ของคุณ ค่านี้จะถูกส่งไปให้ Bitmovin Analytics เพื่อให้คุณสามารถวิเคราะห์พฤติกรรมแบบ "รายบุคคล" ได้</p>
-            
+            <h3>👤 ผู้ใช้งานจำลอง</h3>
             <div class="user-profile">
                 <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Current User ID:</div>
                 <div class="user-id-text" id="display-user-id">กำลังโหลด...</div>
-                <button onclick="resetUserId()">🔄 สร้าง User ID ใหม่ (จำลองคนดูคนใหม่)</button>
+                <button onclick="resetUserId()">🔄 สร้าง User ID ใหม่</button>
+            </div>
+            
+            <div class="progress-box">
+                อนุญาตให้ดูถึง: <span id="progress-percent">0.00</span>%
             </div>
         </div>
     </div>
-
-
 </div>
 
 <script type="text/javascript">
-    // --- 1. ระบบจัดการ User ID ผ่าน LocalStorage ---
     function getOrCreateUserId() {
-        // ลองดึงค่าจาก LocalStorage ก่อน
         let userId = localStorage.getItem('demo_viewer_id');
-        
-        // ถ้าไม่มี (เข้าเว็บครั้งแรก) ให้สร้างใหม่
         if (!userId) {
-            // สร้าง ID สุ่ม เช่น user_a1b2c3d4
             userId = 'user_' + Math.random().toString(36).substr(2, 8);
             localStorage.setItem('demo_viewer_id', userId);
         }
         return userId;
     }
 
-    // ดึงค่ามาแสดงผลบนหน้าเว็บ
     const currentUserId = getOrCreateUserId();
     document.getElementById('display-user-id').innerText = currentUserId;
 
-    // ฟังก์ชันสำหรับปุ่มรีเซ็ต
     function resetUserId() {
         localStorage.removeItem('demo_viewer_id');
-        location.reload(); // รีเฟรชหน้าเว็บเพื่อสร้าง ID และโหลด Player ใหม่
+        localStorage.removeItem(`max_time_${currentUserId}`);
+        location.reload(); 
     }
 
-    // --- 2. การตั้งค่า Bitmovin Player & Analytics ---
     var conf = {
         key: '709e487f-8328-4909-8b71-1f5f8f428029',
         analytics: {
             key: '824e6e4f-4c55-4dc2-8670-c4c34d118c26',
             title: 'My First Video',
             videoId: 'wizard-My_First_Video-1771485207137',
-            // --- ไฮไลต์สำคัญ: ส่ง User ID ไปให้ระบบวิเคราะห์ของ Bitmovin ---
             userId: currentUserId 
         },
     };
@@ -204,8 +229,118 @@
         hls: 'https://pub-67264fd15b0f405dbd6a327da60437ba.r2.dev/video-test/playlist.m3u8',
     };
 
-    // --- 3. สั่งโหลด Player ---
     var player = new bitmovin.player.Player(document.getElementById('player'), conf);
+    
+    let maxTimeWatched = 0;
+    let isEnforcingSeek = false; 
+
+    function showSeekAlert() {
+        let alertBox = document.getElementById('seek-alert');
+        let playerContainer = document.getElementById('player');
+        if (alertBox.parentNode !== playerContainer) {
+            playerContainer.appendChild(alertBox);
+        }
+        alertBox.classList.add('show');
+        setTimeout(() => { alertBox.classList.remove('show'); }, 2500);
+    }
+
+    function updateMaxProgressBar() {
+        let duration = player.getDuration();
+        if (duration <= 0) return;
+
+        let maxPercent = (maxTimeWatched / duration) * 100;
+        document.getElementById('progress-percent').innerText = maxPercent.toFixed(2);
+
+        let maxBar = document.getElementById('custom-max-bar');
+        if (!maxBar) {
+            let seekbarInner = document.querySelector('.bmpui-ui-seekbar .bmpui-seekbar');
+            if (seekbarInner) {
+                maxBar = document.createElement('div');
+                maxBar.id = 'custom-max-bar';
+                maxBar.className = 'custom-max-progress';
+                seekbarInner.appendChild(maxBar);
+
+                // ฟังก์ชันคำนวณระยะชน (ใช้ร่วมกันทั้งเมาส์และนิ้ว)
+                function handlePointerPosition(clientX) {
+                    let rect = seekbarInner.getBoundingClientRect();
+                    let pointerPercent = ((clientX - rect.left) / rect.width) * 100;
+                    let currentMaxPercent = parseFloat(maxBar.style.width); 
+
+                    // ขยายระยะหลบเป็น 12% เผื่อขนาดนิ้วมือบนจอมือถือ
+                    if (Math.abs(pointerPercent - currentMaxPercent) < 12) {
+                        maxBar.classList.add('avoid-collision'); 
+                    } else {
+                        maxBar.classList.remove('avoid-collision'); 
+                    }
+                }
+
+                // --- 🖱️ สำหรับ Desktop (Mouse) ---
+                seekbarInner.addEventListener('mousemove', function(e) {
+                    handlePointerPosition(e.clientX);
+                });
+                seekbarInner.addEventListener('mouseleave', function() {
+                    maxBar.classList.remove('avoid-collision');
+                });
+
+                // --- 📱 สำหรับ Mobile (Touch) ---
+                seekbarInner.addEventListener('touchstart', function(e) {
+                    maxBar.classList.add('is-touched'); // เปิด Tooltip
+                    handlePointerPosition(e.touches[0].clientX);
+                }, {passive: true});
+                
+                seekbarInner.addEventListener('touchmove', function(e) {
+                    handlePointerPosition(e.touches[0].clientX);
+                }, {passive: true});
+
+                seekbarInner.addEventListener('touchend', function() {
+                    maxBar.classList.remove('is-touched'); // ปิด Tooltip
+                    maxBar.classList.remove('avoid-collision'); // ลงมาที่เดิม
+                });
+            }
+        }
+
+        if (maxBar) {
+            maxBar.style.width = maxPercent + '%';
+            maxBar.setAttribute('data-progress', Math.floor(maxPercent) + '%'); 
+            maxBar.style.display = (maxPercent <= 0) ? 'none' : 'block';
+        }
+    }
+
+    player.on(bitmovin.player.PlayerEvent.Ready, function() {
+        let savedProgress = localStorage.getItem(`max_time_${currentUserId}`);
+        if (savedProgress) {
+            maxTimeWatched = parseFloat(savedProgress);
+            if (maxTimeWatched > 0) {
+                player.seek(maxTimeWatched);
+            }
+        }
+        setTimeout(updateMaxProgressBar, 500);
+    });
+
+    player.on(bitmovin.player.PlayerEvent.TimeChanged, function(event) {
+        if (!isEnforcingSeek && event.time > maxTimeWatched) {
+            maxTimeWatched = event.time;
+            localStorage.setItem(`max_time_${currentUserId}`, maxTimeWatched);
+            updateMaxProgressBar();
+        }
+    });
+
+    player.on(bitmovin.player.PlayerEvent.Seek, function(event) {
+        if (event.seekTarget > maxTimeWatched + 1) {
+            isEnforcingSeek = true;
+            showSeekAlert(); 
+            setTimeout(function() {
+                player.seek(maxTimeWatched);
+            }, 10);
+        }
+    });
+
+    player.on(bitmovin.player.PlayerEvent.Seeked, function() {
+        if (isEnforcingSeek) {
+            setTimeout(function() { isEnforcingSeek = false; }, 100); 
+        }
+    });
+
     player.load(source);
 </script>
 
